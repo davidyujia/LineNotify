@@ -12,12 +12,18 @@ namespace davidyujia.LineNotify
     {
         private static readonly string TokenUrl = "https://notify-bot.line.me/oauth/token";
         private static readonly string NotifyUrl = "https://notify-api.line.me/api/notify";
-
         private static readonly string AuthUrl = "https://notify-bot.line.me/oauth/authorize?response_type=code&client_id={0}&redirect_uri={1}&scope=notify&state={2}";
 
-        public static string GetAuthUrl(string clientId, string redirectUri, string state = "")
+        /// <summary>
+        /// Get authorization url
+        /// </summary>
+        /// <param name="clientId">Client Id</param>
+        /// <param name="redirectUrl">Redirect URL(this URL will get "code" and "state")</param>
+        /// <param name="state">your redirect URL will get this</param>
+        /// <returns></returns>
+        public static string GetAuthUrl(string clientId, string redirectUrl, string state = "")
         {
-            return string.Format(AuthUrl, clientId, redirectUri, state);
+            return string.Format(AuthUrl, clientId, redirectUrl, state);
         }
 
         private static string ObjectToJson(object obj)
@@ -52,6 +58,14 @@ namespace davidyujia.LineNotify
             }
         }
 
+        /// <summary>
+        /// Get notify token
+        /// </summary>
+        /// <param name="code">Code</param>
+        /// <param name="clientId">Client ID</param>
+        /// <param name="clientSecret">Client Secret</param>
+        /// <param name="redirectUri">Redirect URL</param>
+        /// <returns></returns>
         public static async Task<string> GetTokenAsync(string code, string clientId, string clientSecret, string redirectUri)
         {
             string result = null;
@@ -91,6 +105,12 @@ namespace davidyujia.LineNotify
             return result;
         }
 
+        /// <summary>
+        /// Push message
+        /// </summary>
+        /// <param name="token">Notify token</param>
+        /// <param name="message">Message</param>
+        /// <returns></returns>
         public static async Task PushAsync(string token, string message)
         {
             var request = (HttpWebRequest)HttpWebRequest.Create(NotifyUrl);

@@ -8,24 +8,51 @@ using System.Threading.Tasks;
 
 namespace davidyujia.LineNotify
 {
-    public static class LineNotifyClient
+    internal class LineNotifyUrls
     {
-        private static readonly string TokenUrl = "https://notify-bot.line.me/oauth/token";
-        private static readonly string NotifyUrl = "https://notify-api.line.me/api/notify";
-        private static readonly string AuthUrl = "https://notify-bot.line.me/oauth/authorize?response_type=code&client_id={0}&redirect_uri={1}&scope=notify&state={2}";
+        public static readonly string TokenUrl = "https://notify-bot.line.me/oauth/token";
+        public static readonly string NotifyUrl = "https://notify-api.line.me/api/notify";
+        public static readonly string AuthUrl = "https://notify-bot.line.me/oauth/authorize?response_type=code&client_id={0}&redirect_uri={1}&scope=notify{2}";
+        public static readonly string AuthUrlWithState = AuthUrl + "&state={0}";
+    }
 
-        /// <summary>
-        /// Get authorization url
-        /// </summary>
-        /// <param name="clientId">Client Id</param>
-        /// <param name="redirectUrl">Redirect URL(this URL will get "code" and "state")</param>
-        /// <param name="state">your redirect URL will get this</param>
-        /// <returns></returns>
-        public static string GetAuthUrl(string clientId, string redirectUrl, string state = "")
+    public class LineNotifyAuthUrl
+    {
+        private readonly string _client;
+        private readonly string _redirectUrl;
+        private readonly string _state;
+
+        public LineNotifyAuthUrl(string clientId, string redirectUrl) : this(clientId, redirectUrl, null)
         {
-            return string.Format(AuthUrl, clientId, redirectUrl, state);
         }
 
+        public LineNotifyAuthUrl(string clientId, string redirectUrl, string state)
+        {
+            if (string.IsNullOrWhiteSpace(clientId))
+            {
+                throw new ArgumentNullException(nameof(clientId));
+            }
+
+            if (string.IsNullOrWhiteSpace(redirectUrl))
+            {
+                throw new ArgumentNullException(nameof(redirectUrl));
+            }
+
+            _client = clientId;
+            _redirectUrl = redirectUrl;
+            _state = state;
+        }
+
+        public override string ToString()
+        {
+            return string.IsNullOrWhiteSpace(_state)
+            ? string.Format(LineNotifyUrls.AuthUrl, _client, _redirectUrl)
+            : string.Format(LineNotifyUrls.AuthUrlWithState, _client, _redirectUrl, _state);
+        }
+    }
+
+    public static class LineNotifyClient
+    {
         private static string ObjectToJson(object obj)
         {
             using (var ms = new MemoryStream())
@@ -70,7 +97,7 @@ namespace davidyujia.LineNotify
         {
             string result = null;
 
-            var request = (HttpWebRequest)HttpWebRequest.Create(TokenUrl);
+            var request = (HttpWebRequest)HttpWebRequest.Create(LineNotifyUrls.TokenUrl);
             request.Method = WebRequestMethods.Http.Post;
             request.ContentType = "application/x-www-form-urlencoded";
 
@@ -113,7 +140,7 @@ namespace davidyujia.LineNotify
         /// <returns></returns>
         public static async Task PushAsync(string token, string message)
         {
-            var request = (HttpWebRequest)HttpWebRequest.Create(NotifyUrl);
+            var request = (HttpWebRequest)HttpWebRequest.Create(LineNotifyUrls.NotifyUrl);
             request.Method = WebRequestMethods.Http.Post;
             request.Headers.Add("Authorization", $"Bearer {token}");
             request.ContentType = "application/x-www-form-urlencoded";
@@ -157,6 +184,5 @@ namespace davidyujia.LineNotify
             [DataMember]
             internal string access_token { get; set; }
         }
-
     }
 }

@@ -16,9 +16,6 @@ namespace davidyujia.LineNotify
         public static readonly string AuthUrlWithState = AuthUrl + "&state={2}";
     }
 
-    /// <summary>
-    /// 取得驗證用的 url
-    /// </summary>
     public class LineNotifyAuthUrl
     {
         private readonly string _client;
@@ -29,12 +26,6 @@ namespace davidyujia.LineNotify
         {
         }
 
-        /// <summary>
-        /// 取得驗證用的 url
-        /// </summary>
-        /// <param name="clientId"></param>
-        /// <param name="redirectUrl"></param>
-        /// <param name="state">自訂狀態</param>
         public LineNotifyAuthUrl(string clientId, string redirectUrl, string state)
         {
             if (string.IsNullOrWhiteSpace(clientId))
@@ -93,14 +84,6 @@ namespace davidyujia.LineNotify
             }
         }
 
-        /// <summary>
-        /// 取得推播用token
-        /// </summary>
-        /// <param name="code">Code</param>
-        /// <param name="clientId">Client ID</param>
-        /// <param name="clientSecret">Client Secret</param>
-        /// <param name="redirectUri">Redirect URL</param>
-        /// <returns></returns>
         public static async Task<string> GetTokenAsync(string code, string clientId, string clientSecret, string redirectUri)
         {
             string result = null;
@@ -140,12 +123,6 @@ namespace davidyujia.LineNotify
             return result;
         }
 
-        /// <summary>
-        /// 推播訊息
-        /// </summary>
-        /// <param name="token">Notify token</param>
-        /// <param name="message">Message</param>
-        /// <returns></returns>
         public static async Task PushAsync(string token, string message)
         {
             var request = (HttpWebRequest)HttpWebRequest.Create(LineNotifyUrls.NotifyUrl);

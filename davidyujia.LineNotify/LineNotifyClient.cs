@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Net;
 using System.Runtime.Serialization;
@@ -12,10 +12,13 @@ namespace davidyujia.LineNotify
     {
         public static readonly string TokenUrl = "https://notify-bot.line.me/oauth/token";
         public static readonly string NotifyUrl = "https://notify-api.line.me/api/notify";
-        public static readonly string AuthUrl = "https://notify-bot.line.me/oauth/authorize?response_type=code&client_id={0}&redirect_uri={1}&scope=notify{2}";
-        public static readonly string AuthUrlWithState = AuthUrl + "&state={0}";
+        public static readonly string AuthUrl = "https://notify-bot.line.me/oauth/authorize?response_type=code&client_id={0}&redirect_uri={1}&scope=notify";
+        public static readonly string AuthUrlWithState = AuthUrl + "&state={2}";
     }
 
+    /// <summary>
+    /// 取得驗證用的 url
+    /// </summary>
     public class LineNotifyAuthUrl
     {
         private readonly string _client;
@@ -26,6 +29,12 @@ namespace davidyujia.LineNotify
         {
         }
 
+        /// <summary>
+        /// 取得驗證用的 url
+        /// </summary>
+        /// <param name="clientId"></param>
+        /// <param name="redirectUrl"></param>
+        /// <param name="state">自訂狀態</param>
         public LineNotifyAuthUrl(string clientId, string redirectUrl, string state)
         {
             if (string.IsNullOrWhiteSpace(clientId))
@@ -62,7 +71,6 @@ namespace davidyujia.LineNotify
                 var json = ms.ToArray();
                 return Encoding.UTF8.GetString(json, 0, json.Length);
             }
-
         }
 
         private static T GetResult<T>(Stream stream) where T : class
@@ -86,7 +94,7 @@ namespace davidyujia.LineNotify
         }
 
         /// <summary>
-        /// Get notify token
+        /// 取得推播用token
         /// </summary>
         /// <param name="code">Code</param>
         /// <param name="clientId">Client ID</param>
@@ -133,7 +141,7 @@ namespace davidyujia.LineNotify
         }
 
         /// <summary>
-        /// Push message
+        /// 推播訊息
         /// </summary>
         /// <param name="token">Notify token</param>
         /// <param name="message">Message</param>
